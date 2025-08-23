@@ -1,0 +1,34 @@
+name: PR against main
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout to gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+      - name: Set git user for CI
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "suryakohli11@gmail.com"
+      - name: Delete feature branch folder
+        run: |
+          git rm -r --ignore-unmatch demo/${{github.head_ref}}
+          git commit -m 'Delete feature branch folder'
+          git push origin gh-pages
+      - name: Add PR comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          sleep 60
+          COMMENT=$(cat <<EOF 
+          **Deployment for feature is removed**
+          The deployed link is no longer available
+          EOF)
+          gh pr comment ${{github.event.pull_request.number}} --body "$COMMENT"

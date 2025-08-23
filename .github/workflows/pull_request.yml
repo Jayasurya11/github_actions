@@ -1,0 +1,56 @@
+name: PR against main
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.5.1
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: deps-node-modules-${{ hashFiles('./package-lock.json') }}
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: Deploy storybook to GH-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          destination_dir: demo/${{ github.head_ref}}
+      - name: Add PR comments about storybook deployment
+        if: github.event.pull_request.number!=''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          sleep 60
+          COMMENT_INITIAL= $(cat <<EOF
+          **Your Feature has been deployed**
+          You can view it at: https://Jayasurya11.github.io/github_actions/demo/${{ github.head_ref}}
+          )
+          COMMENT_UPDATE= $(cat <<EOF
+          **Your Feature has been updated**
+          You can view it at: https://Jayasurya11.github.io/github_actions/demo/${{ github.head_ref}}
+          )
+          PR_ACTION= "${{github.event.action}}"
+          PR_MERGED= "${{github.event.pull_request.merged}}"
+          if [[ "$PR_ACTION" == "synchronize" || "$PR_MERGED"== "true"]] ; then
+            gh pr comment ${{github.event.pull_request.number}} --body "$COMMENT_UPDATE"
+          elif [["$PR_ACTION" == "opened" || "$PR_ACTION"=="reopened"]]; then
+            gh pr comment ${{github.event.pull_request.number}} --body "$COMMENT_INITIAL"
+          
+          fi
