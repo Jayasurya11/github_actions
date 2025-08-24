@@ -40,16 +40,19 @@ jobs:
           sleep 60
           COMMENT_INITIAL=$(cat <<EOF
           **Your Feature has been deployed**
-          You can view it at: https://Jayasurya11.github.io/github_actions/demo/${{ github.head_ref}}
-          EOF)
+          You can view it at: https://Jayasurya11.github.io/github_actions/demo/${{ github.head_ref }}
+          EOF
+          )
           COMMENT_UPDATE=$(cat <<EOF
           **Your Feature has been updated**
-          You can view it at: https://Jayasurya11.github.io/github_actions/demo/${{ github.head_ref}}
-          EOF)
-          PR_ACTION= "${{github.event.action}}"
-          PR_MERGED= "${{github.event.pull_request.merged}}"
-          if [[ "$PR_ACTION" == "synchronize" || "$PR_MERGED"== "true"]] ; then
-            gh pr comment ${{github.event.pull_request.number}} --body "$COMMENT_UPDATE"
-          elif [["$PR_ACTION" == "opened" || "$PR_ACTION"=="reopened"]]; then
-            gh pr comment ${{github.event.pull_request.number}} --body "$COMMENT_INITIAL"
+          You can view it at: https://Jayasurya11.github.io/github_actions/demo/${{ github.head_ref }}
+          EOF
+          )
+          PR_ACTION="${{ github.event.action }}"
+          PR_MERGED="${{ github.event.pull_request.merged }}"
+
+          if [[ "$PR_ACTION" == "synchronize" || "$PR_MERGED" == "true" ]]; then
+            gh pr comment ${{ github.event.pull_request.number }} --body "$COMMENT_UPDATE"
+          elif [[ "$PR_ACTION" == "opened" || "$PR_ACTION" == "reopened" ]]; then
+            gh pr comment ${{ github.event.pull_request.number }} --body "$COMMENT_INITIAL"
           fi
