@@ -40,12 +40,12 @@ jobs:
           sleep 60
           COMMENT_INITIAL=$(cat <<EOF
           **Your Feature has been deployed**
-          You can view it at: https://Jayasurya11.github.io/github_actions/demo/${{ github.head_ref }}
+          You can view it at: https://Jayasurya11.github.io/github_actions/demo/${{ github.head_ref }}?nocache=1
           EOF
           )
           COMMENT_UPDATE=$(cat <<EOF
           **Your Feature has been updated**
-          You can view it at: https://Jayasurya11.github.io/github_actions/demo/${{ github.head_ref }}
+          You can view it at: https://Jayasurya11.github.io/github_actions/demo/${{ github.head_ref }}?nocache=1
           EOF
           )
           PR_ACTION="${{ github.event.action }}"
